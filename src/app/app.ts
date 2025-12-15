@@ -1,25 +1,60 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
 import { DxDataGridModule } from 'devextreme-angular';
+import CustomStore from 'devextreme/data/custom_store';
 
 @Component({
   selector: 'app-root',
+  standalone: true,
   imports: [DxDataGridModule],
-
   templateUrl: './app.html',
-  styleUrl: './app.scss'
+  styleUrls: ['./app.scss']
 })
 export class App {
-  protected title = 'dxgrid-demo';
-  data: any[] = [];
+
+  title = 'dxgrid-demo';
+
   selectedRowKeys: number[] = [];
-constructor() {
+  allData: any[] = [];
+  dataSources: any;
+
+  constructor() {
+
+    // create local "server" data
     for (let i = 1; i <= 400; i++) {
-      this.data.push({
+      this.allData.push({
         id: i,
         name: 'Record ' + i
       });
     }
+
+    // simulate remote paging using Promise
+    this.dataSources = new CustomStore({
+      key: 'id',
+      load: (loadOptions: any) => {
+
+        const skip = loadOptions.skip ?? 0;
+        const take = loadOptions.take ?? 5;
+
+        console.log('load called → skip:', skip, 'take:', take);
+
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            const pageData = this.allData.slice(skip, skip + take);
+
+            resolve({
+              data: pageData,
+              totalCount: this.allData.length
+            });
+          }, 300);
+        });
+      }
+    });
   }
+  onOptionChanged(e: any) {
+  // Check if pageIndex changed
+  if (e.fullName === 'paging.pageIndex') {
+    this.selectedRowKeys = []; // Clear selection
+  }
+}
 
 }

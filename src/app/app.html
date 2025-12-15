@@ -1,7 +1,8 @@
 <dx-data-grid
-  [dataSource]="data"
+  [dataSource]="dataSources"
   [keyExpr]="'id'"
-  [paging]="{ pageSize: 100 }"
+  [paging]="{ pageSize: 5 }"
+  [remoteOperations]="{ paging: true }"
   [selection]="{
     mode: 'multiple',
     showCheckBoxesMode: 'always',
@@ -9,6 +10,7 @@
   }"
   [selectedRowKeys]="selectedRowKeys"
   (onSelectionChanged)="selectedRowKeys = $event.selectedRowKeys"
+  (onOptionChanged)="onOptionChanged($event)"
 >
   <dxo-pager
     [showPageSizeSelector]="true"
